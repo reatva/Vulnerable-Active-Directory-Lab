@@ -1,0 +1,96 @@
+{
+    "version": "4.5",
+    "name": "AD Lab - MITRE ATT&CK Coverage",
+    "domain": "enterprise-attack",
+    "description": "Layer showing all tactics & techniques used in the AD lab scenario, from RDP to Golden Ticket.",
+    "techniques": [
+        {
+            "techniqueID": "T1078",
+            "tactic": "initial-access",
+            "comment": "Weak domain creds for RDP into Client1",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1021.001",
+            "tactic": "execution",
+            "comment": "RDP session to run commands on Client1",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1134.001",
+            "tactic": "privilege-escalation",
+            "comment": "Potato exploit (SeImpersonatePrivilege) for SYSTEM shell",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1552",
+            "tactic": "credential-access",
+            "comment": "Cleartext creds found in Administrator's PowerShell history",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1021.002",
+            "tactic": "lateral-movement",
+            "comment": "Use found creds to access Client2 SMB share",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1110.002",
+            "tactic": "credential-access",
+            "comment": "Crack ZIP, AS-REP hash, SPN hash",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1005",
+            "tactic": "collection",
+            "comment": "Extract usernames from ZIP images",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1558.004",
+            "tactic": "credential-access",
+            "comment": "AS-REP Roasting: discover and crack hash",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1558.003",
+            "tactic": "credential-access",
+            "comment": "Kerberoasting: extract and crack SPN hash",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1098",
+            "tactic": "persistence",
+            "comment": "Reset password chain via BloodHound finding",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1003.003",
+            "tactic": "credential-access",
+            "comment": "DCSync: dump NTDS to get domain hashes",
+            "color": "#66ff66"
+        },
+        {
+            "techniqueID": "T1550.003",
+            "tactic": "persistence",
+            "comment": "Golden Ticket: forge ticket for indefinite access",
+            "color": "#66ff66"
+        }
+    ],
+    "legendItems": [
+        {
+            "label": "Implemented",
+            "color": "#66ff66"
+        }
+    ],
+    "metadata": [
+        {
+            "name": "author",
+            "value": "User's AD Lab"
+        },
+        {
+            "name": "created",
+            "value": "2025-06-21"
+        }
+    ]
+}
