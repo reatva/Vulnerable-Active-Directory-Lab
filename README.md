@@ -1,4 +1,4 @@
-## Vulnerable Active Directory Lab
+## Vulnerable Active Directory Lab OSCP Style
 Automated custom-built vulnerable Active Directory environment designed to simulate a full attack chain. The lab includes intensional misconfigurations such as an exposed SMB share with users files, users accounts that are AS-REP roastable and Kerberoastable, and privilege escalation paths that allow password changes for a privilege user. Exploiting these weaknesses step-by-step leads to a successful DCSync attack and full domain compromise.
 ## Diagram
 ![diagrama](https://github.com/user-attachments/assets/8178b195-70bc-48bf-98a0-4e162078a346)
@@ -16,6 +16,7 @@ Automated custom-built vulnerable Active Directory environment designed to simul
 - Privilege Escalation Paths: Reset Password, DCSync
 - Hardening Bypass on CLIENT1: RDP Access, SeImpersonatePrivilege
 - Exploitable SMB share on CLIENT2: SMB folder with zip file
+- Walktrough OSCP Style + Template using [Sysreptor](https://github.com/Syslifters/sysreptor)  
 
 ## Lab Objective
 The goal of this lab is to simulate a realistic attack chain in an Active Directory environment. It shows how common misconfigurations and overlooked settings can be combined to compromise an entire domain. It can be used as reference for pentesters portfolio.
@@ -62,19 +63,19 @@ The goal of this lab is to simulate a realistic attack chain in an Active Direct
 ## Domain and Clients configuration
 
 ### DC
--  On powershell we run DC_script.ps1, the script will create domain users, AS-RERProastble and Kerberoastable users, create a GPO to disable windows updates, firewall and defender, assign Reset Password and DCSync permissions.
+1.  On powershell we run [DC_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/DC_script.ps1), the script will create domain users, AS-RERProastble and Kerberoastable users, create a GPO to disable windows updates, firewall and defender, assign Reset Password and DCSync permissions.
 ```powershell
 powershell -ep bypass
 .\DC_SCRIPT.PS1
 ```
-  - We restric LDAP queries for Nicol following the next steps. By restricting LDAP queries user Nicol won't be able to gather Domain info using tools as rpcclient or ldapsearch.
+  2. We restric LDAP queries for Nicol following the next steps. By restricting LDAP queries user Nicol won't be able to gather Domain info using tools as rpcclient or ldapsearch.
   ```
   Go to: Group Policy Management  
   	Group Policy Objects > Deny LDAP Access > Edit 
   		Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > User Rights Assignment
   			Deny Access to this computer from the network > Add User or Group > LDAP_Deny_Group
   ```
-  - As the final step we link the GPO to the Domain Controllers ( The script already creates the Group and the GPO but manual step is necessary)
+  3. As the final step we link the GPO to the Domain Controllers ( The script already creates the Group and the GPO but manual step is necessary)
   ```
   Go to : Group Policy Management
   	Domain Controllers > Right click > Link an existing GPO > Deny LDAP Access > OK
@@ -82,7 +83,7 @@ powershell -ep bypass
 [DC.webm](https://github.com/user-attachments/assets/3a71db16-ee3c-4f5e-907c-5b2fbb517e85)
 
 ### CLIENT 2
-- On powershell we run c2_script.ps1, this will create a SMB Folder and add Nicol to it
+1. On CLIENT2 we copy [images.zip](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/images.zip) & c2_script.ps1 from CLIENT1 and after that we ran the [c2_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/c2_script.ps1)
    ```powershell
    powershell -ep bypass
    .\c2_script.ps1
@@ -90,11 +91,16 @@ powershell -ep bypass
 [CLIENT2.webm](https://github.com/user-attachments/assets/39afdffa-71ce-488a-a22b-bf809d1fbf73)
 
 ### CLIENT1
-- On powershell we run c1_script.ps1, this will add user Adrian to Local RDP Group, enable RDP, and enable Administrator account
+1. On powershell we run [c1_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/c1_script.ps1), this will add user Adrian to Local RDP Group, enable RDP, and enable Administrator account
    ```powershell
    powershell -ep bypass
    .\c2_script.ps1
    ```
+2. We give user adrian SeImpersonatePrivilege
+  ```
+  Go to:
+  "Windows Administrative Tools" > "Local Security Poliy" > "Local Policies" "USer Rights Assignment" > "Impersonate client after authentication" > add > Adrian
+  ```
 [CLIENT1.webm](https://github.com/user-attachments/assets/92b2a1a1-659f-4849-a4b9-5a9706e76378)
 
 ## Attack Flow
@@ -135,6 +141,7 @@ powershell -ep bypass
 
 
 ## Mitre ATT&CK Coverage
+- Use [ATTACK-navigator](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/ATTACK-navigator-v4.5.json) file and uploaded it [HERE](https://mitre-attack.github.io/attack-navigator/) to see full attack matrix.
 
 | Tactic               | Technique                                      | ID        | NOTES                                         |
 | -------------------- | ---------------------------------------------- | --------- | ----------------------------------------------------- |
