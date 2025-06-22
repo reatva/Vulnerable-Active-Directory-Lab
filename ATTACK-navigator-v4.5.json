@@ -1,6 +1,6 @@
 {
     "version": "4.5",
-    "name": "AD Lab - MITRE ATT&CK Coverage",
+    "name": "Automated AD Lab - MITRE ATT&CK Coverage",
     "domain": "enterprise-attack",
     "description": "Layer showing all tactics & techniques used in the AD lab scenario, from RDP to Golden Ticket.",
     "techniques": [
@@ -85,7 +85,7 @@
     ],
     "metadata": [
         {
-            "name": "author",
+            "name": "reatva",
             "value": "User's AD Lab"
         },
         {
