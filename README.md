@@ -98,7 +98,7 @@ powershell -ep bypass
 [CLIENT1.webm](https://github.com/user-attachments/assets/92b2a1a1-659f-4849-a4b9-5a9706e76378)
 
 ## Attack Flow
-Read full write-up here 
+[READ FULL WRITE-UP HERE](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/Lab-Walktrough.pdf)
 
 - Step 1: Initial Access
   Weak domain creds used to RDP to Client1
