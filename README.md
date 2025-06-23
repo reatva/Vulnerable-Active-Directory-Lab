@@ -1,5 +1,14 @@
 ## Vulnerable Active Directory Lab OSCP Style
-Automated custom-built vulnerable Active Directory environment designed to simulate a full attack chain. The lab includes intensional misconfigurations such as an exposed SMB share with users files, users accounts that are AS-REP roastable and Kerberoastable, and privilege escalation paths that allow password changes for a privilege user. Exploiting these weaknesses step-by-step leads to a successful DCSync attack and full domain compromise.
+Automated custom-built vulnerable Active Directory environment designed to simulate a full attack chain OSCP Style. This lab **automates the vulnerabilities in CLIENTS machines and DC**, in order for the scripts to work, the **Domain Controller has to be already created and the CLIENTS machines already joined to it**. This lab assumes a **breach scenario** as is common in real-world penetration testings. It also includes intensional misconfigurations such as an exposed SMB share with users files, users accounts that are AS-REP roastable and Kerberoastable, and privilege escalation paths that allow password changes for a privilege user. Exploiting these weaknesses step-by-step leads to a successful DCSync attack and full domain compromise. 
+
+```diff
+- CLIENT1 CREDENTIALS
+Username: adrian
+Password: Not4@ver3ge!
+```
+> [!IMPORTANT]
+> This lab **automates the vulnerabilities in CLIENTS machines and DC**, in order for the scripts to work, the **Domain Controller has to be already created and the CLIENTS machines already joined to it**
+
 ## Diagram
 ![diagrama](https://github.com/user-attachments/assets/8178b195-70bc-48bf-98a0-4e162078a346)
 ## Lab Topology
@@ -11,7 +20,7 @@ Automated custom-built vulnerable Active Directory environment designed to simul
 | Kali | Attacker | 1 NIC |192.168.10.100| Can pivot through Client1 |
 
 ## Lab Key Features
-- Active Directory Automated Domain setup: Vulnerable users, weak passwords, delegated permissions, GPO disables Defender, Firewall, Updates
+- Active Directory Automated Domain setup: Weak passwords, delegated permissions, GPO disables Defender, Firewall, Updates
 - Vulnerable User Accounts: Kerberoasting, AS-REProastable
 - Privilege Escalation Paths: Reset Password, DCSync
 - Hardening Bypass on CLIENT1: RDP Access, SeImpersonatePrivilege
@@ -27,6 +36,7 @@ The goal of this lab is to simulate a realistic attack chain in an Active Direct
 [Windows Server 2016 ISO](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2016)
 
 ## Environment Setup & Configuration
+
 1. Import VMs in VirtualBox/VMware.
 
 2. Assign Internal Network interfaces to VMs
@@ -50,20 +60,34 @@ The goal of this lab is to simulate a realistic attack chain in an Active Direct
   sudo ip addr add 192.168.10.100/24 dev eth1
   sudo ip link set eth1 up
   ```
-5. Take a snapshot of all 3 machines
-6. Download the scripts to your kali machine and share them with python to download them from CLIENT1
+> [!IMPORTANT]
+> Take a snapshot of all 3 machines before running the scripts in order to be able to reset the changes.
+
+## Sharing scripts to internal clients (CLIENT2 and DC)
+   
+1. Download the scripts to your kali machine and share them with python to download them from CLIENT1
   ```
   python3 -m http.server80
-  iwr -uri http://<IP>/<FILE> -Outfile <FILENAME>
   ```
-7. In CLIENT1 put the downloaded files in a SMB Folder so they will be accessible from any machine (To do this we have to be connected in each machine as a Domain user/admin)
+2. In CLIENT1 download the files and put them in a SMB Folder so they will be accessible from any machine
+  ```
+  mkdir C:\FILES
+  iwr -uri http://<IP>/DC_script.ps1 -Outfile DC_script.ps1 
+  iwr -uri http://<IP>/c1_script.ps1 -Outfile c1_script.ps1
+  iwr -uri http://<IP>/c2_script.ps1 -Outfile c2_script.ps1
+  iwr -uri http://<IP>/images.zip -Outfile images.zip
+  Share FILES directory
+  ```
+
 
 [c1_smbsharing.webm](https://github.com/user-attachments/assets/68b1fa6b-0e0d-4e47-834e-86624a632271)
+> [!IMPORTANT]
+> You have to loggin in all machines as Domain Admin and run the scripts in a Powershell console as Administrator.
 
 ## Domain and Clients configuration
 
 ### DC
-1.  On powershell we run [DC_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/DC_script.ps1), the script will create domain users, AS-RERProastble and Kerberoastable users, create a GPO to disable windows updates, firewall and defender, assign Reset Password and DCSync permissions.
+1.  Access \\\\Client1\SHARE and download [DC_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/DC_script.ps1), open a Powershell console as Administrator and run the script. It will create domain users, AS-RERProastble and Kerberoastable users, create a GPO to disable windows updates, firewall and defender, assign Reset Password and DCSync permissions.
 ```powershell
 powershell -ep bypass
 .\DC_SCRIPT.PS1
@@ -83,7 +107,7 @@ powershell -ep bypass
 [DC.webm](https://github.com/user-attachments/assets/3a71db16-ee3c-4f5e-907c-5b2fbb517e85)
 
 ### CLIENT 2
-1. On CLIENT2 we copy [images.zip](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/images.zip) & c2_script.ps1 from CLIENT1 and after that we ran the [c2_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/c2_script.ps1)
+1. Access \\\\Client1\Share and copy [images.zip](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/images.zip) & [c2_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/c2_script.ps1), after that we run c2_script.ps1.
    ```powershell
    powershell -ep bypass
    .\c2_script.ps1
@@ -91,12 +115,12 @@ powershell -ep bypass
 [CLIENT2.webm](https://github.com/user-attachments/assets/39afdffa-71ce-488a-a22b-bf809d1fbf73)
 
 ### CLIENT1
-1. On powershell we run [c1_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/c1_script.ps1), this will add user Adrian to Local RDP Group, enable RDP, and enable Administrator account
+1. Finally, run [c1_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/c1_script.ps1), this will add user Adrian to Local RDP Group, enable RDP, and enable Administrator's account.
    ```powershell
    powershell -ep bypass
    .\c2_script.ps1
    ```
-2. We give user adrian SeImpersonatePrivilege
+2. To assign user adrian SeImpersonatePrivilege
   ```
   Go to:
   "Windows Administrative Tools" > "Local Security Poliy" > "Local Policies" "USer Rights Assignment" > "Impersonate client after authentication" > add > Adrian
