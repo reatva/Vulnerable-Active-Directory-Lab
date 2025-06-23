@@ -125,6 +125,10 @@ powershell -ep bypass
   Go to:
   "Windows Administrative Tools" > "Local Security Poliy" > "Local Policies" "USer Rights Assignment" > "Impersonate client after authentication" > add > Adrian
   ```
+3. Log-in as Administrator and run the following command to create an exploitation path.
+```
+runas.exe /u:Nicol /p:Ready4@ll! cmd.exe
+```
 [CLIENT1.webm](https://github.com/user-attachments/assets/92b2a1a1-659f-4849-a4b9-5a9706e76378)
 
 ## Attack Flow
