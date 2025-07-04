@@ -1,4 +1,4 @@
-## Vulnerable Active Directory Lab OSCP Style
+## Vulnerable Active Directory Lab
 
 A professionally structured Active Directory (AD) lab environment designed for hands-on learning and security testing. This lab simulates common real-world misconfigurations and vulnerabilities found in enterprise Windows domains, making it ideal for red team training, blue team defense, and purple team analysis.
 
@@ -37,10 +37,7 @@ A professionally structured Active Directory (AD) lab environment designed for h
 - Privilege Escalation Paths: Reset Password, DCSync
 - Hardening Bypass on CLIENT1: RDP Access, SeImpersonatePrivilege
 - Exploitable SMB share on CLIENT2: SMB folder with zip file
-- Walktrough OSCP Style + Template using [Sysreptor](https://github.com/Syslifters/sysreptor)  
-
-## Lab Preview
-
+- Walktrough OSCP Style + Template using [Sysreptor](https://github.com/Syslifters/sysreptor)
 
 ## Attack Flow
 [READ FULL WRITE-UP HERE](/Writeup/Lab-Walktrough.pdf)
