@@ -1,6 +1,6 @@
 # Kerberoasting in Active Directory
 
-## 🔍 Technique Overview
+## Technique Overview
 
 Kerberoasting is a exploitation technique in which an attacker with a low-privileged domain account requests service tickets (TGS) for service accounts and attempts to crack them offline to recover plaintext credentials.
 
@@ -9,7 +9,7 @@ Kerberoasting is a exploitation technique in which an attacker with a low-privil
 
 ---
 
-## 🏗️ Lab Misconfiguration
+## Lab Misconfiguration
 
 In this lab, a service account ('svc_iis') was:
 - Configured with **Service Principal Name (SPN)**: 'HTTP/webserver.mydomain.com'
