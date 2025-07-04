@@ -1,23 +1,35 @@
 ## Vulnerable Active Directory Lab OSCP Style
-Automated custom-built vulnerable Active Directory environment designed to simulate a full attack chain OSCP Style. This lab **automates the vulnerabilities in CLIENTS machines and DC**, in order for the scripts to work, the **Domain Controller has to be already created and the CLIENTS machines already joined to it**. This lab assumes a **breach scenario** as is common in real-world penetration testings. It also includes intensional misconfigurations such as an exposed SMB share with users files, users accounts that are AS-REP roastable and Kerberoastable, and privilege escalation paths that allow password changes for a privilege user. Exploiting these weaknesses step-by-step leads to a successful DCSync attack and full domain compromise. 
 
-```diff
-- CLIENT1 CREDENTIALS
-Username: adrian
-Password: Not4@ver3ge!
-```
-> [!IMPORTANT]
-> This lab **automates the vulnerabilities in CLIENTS machines and DC**, in order for the scripts to work, the **Domain Controller has to be already created and the CLIENTS machines already joined to it**
+A professionally structured Active Directory (AD) lab environment designed for hands-on learning and security testing. This lab simulates common real-world misconfigurations and vulnerabilities found in enterprise Windows domains, making it ideal for red team training, blue team defense, and purple team analysis.
 
-## Diagram
-![diagrama](https://github.com/user-attachments/assets/8178b195-70bc-48bf-98a0-4e162078a346)
-## Lab Topology
-| Host | Role | NICs |IP| Vulns |
+![Alt text](/diagram.jpg)
+
+## Objectives
+- Design and build a vulnerable Active Directory environment from scratch.
+- Deploy a realistic and intentional vulnerabilities found in Windows domains.
+- Perform hands-on exploitation of AD attack paths, including:
+  - Kerberoasting 
+  - ASRERProasting
+  - DCSync
+- Document exploitation steps and techniques for learning and portfolio demonstration.
+
+> [!NOTE]
+> This lab is focused purely on **offensive exploitation** with no blue team components(detection or mitigation).
+
+## Lab Architecture
+| Host | Role | NICs |IP| OS |
 |------|------|------|--|-------|
-| DC | Domain Controller | 1 NIC |10.10.1.200| AS-REProastable, Kerberoastable, Reset Password, DCSync |
-| Client1 | Windows Client | 2 NICs |192.168.10.101  10.10.1.201|RDP, SeImpersonatePrivilege, Powershell History|
-| Client2 | Windows Client | 1 NIC |10.10.1.202| SMB folder with zip file |
-| Kali | Attacker | 1 NIC |192.168.10.100| Can pivot through Client1 |
+| DC | Domain Controller | 1 NIC |10.10.1.200| Windows Server 2016 |
+| Client1 | Windows Client | 2 NICs |192.168.10.101  10.10.1.201| Windows 10 |
+| Client2 | Windows Client | 1 NIC |10.10.1.202| Windows 10 |
+| Kali | Attacker | 1 NIC |192.168.10.100| Atatcker Box |
+
+## Technologies Used
+- Active Directory Domain Services
+- Group Policy
+- Powershell
+- Bash
+- Impacket tools
 
 ## Lab Key Features
 - Active Directory Automated Domain setup: Weak passwords, delegated permissions, GPO disables Defender, Firewall, Updates
@@ -27,112 +39,11 @@ Password: Not4@ver3ge!
 - Exploitable SMB share on CLIENT2: SMB folder with zip file
 - Walktrough OSCP Style + Template using [Sysreptor](https://github.com/Syslifters/sysreptor)  
 
-## Lab Objective
-The goal of this lab is to simulate a realistic attack chain in an Active Directory environment. It shows how common misconfigurations and overlooked settings can be combined to compromise an entire domain. It can be used as reference for pentesters portfolio.
+## Lab Preview
 
-## To Download:
-[Windows 10 ISO](https://www.microsoft.com/en-au/software-download/windows10)
-
-[Windows Server 2016 ISO](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2016)
-
-## Environment Setup & Configuration
-
-1. Import VMs in VirtualBox/VMware.
-
-2. Assign Internal Network interfaces to VMs
-
-3. Install Windows Server and Client ISO 
-
-4. Create a new Forest on Windows Server
-- Join CLIENTS to DC, all of them have to be in the same Internal network/share the same IP range
-  ![lab39](https://github.com/user-attachments/assets/6a996f85-1fc5-482b-b40a-eb05093b6937)
-- Add a second Internal Network adapter to kali and Client1 for communication from VM Manager
-  ![lab42](https://github.com/user-attachments/assets/c38c8cc0-8ce2-4bad-9b21-79cfe1d06749)
-
-- Set IP in CLIENT1 : 192.168.10.101
-  ```
-  Network & Internet Settings > Ethernet > Properties > IPv4
-  IP: 192.168.10.101
-  Netmask: 255.255.255.0
-  ```
-- Set IP in Kali : 192.168.10.100
-  ```bash
-  sudo ip addr add 192.168.10.100/24 dev eth1
-  sudo ip link set eth1 up
-  ```
-> [!IMPORTANT]
-> Take a snapshot of all 3 machines before running the scripts in order to be able to reset the changes.
-
-## Sharing scripts to internal clients (CLIENT2 and DC)
-   
-1. Download the scripts to your kali machine and share them with python to download them from CLIENT1
-  ```
-  python3 -m http.server80
-  ```
-2. In CLIENT1 download the files and put them in a SMB Folder so they will be accessible from any machine
-  ```
-  mkdir C:\FILES
-  iwr -uri http://<IP>/DC_script.ps1 -Outfile DC_script.ps1 
-  iwr -uri http://<IP>/c1_script.ps1 -Outfile c1_script.ps1
-  iwr -uri http://<IP>/c2_script.ps1 -Outfile c2_script.ps1
-  iwr -uri http://<IP>/images.zip -Outfile images.zip
-  Share FILES directory
-  ```
-
-
-[c1_smbsharing.webm](https://github.com/user-attachments/assets/68b1fa6b-0e0d-4e47-834e-86624a632271)
-> [!IMPORTANT]
-> You have to loggin in all machines as Domain Admin and run the scripts in a Powershell console as Administrator.
-
-## Domain and Clients configuration
-
-### DC
-1.  Access \\\\Client1\SHARE and download [DC_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/DC_script.ps1), open a Powershell console as Administrator and run the script. It will create domain users, AS-RERProastble and Kerberoastable users, create a GPO to disable windows updates, firewall and defender, assign Reset Password and DCSync permissions.
-```powershell
-powershell -ep bypass
-.\DC_SCRIPT.PS1
-```
-  2. We restric LDAP queries for Nicol following the next steps. By restricting LDAP queries user Nicol won't be able to gather Domain info using tools as rpcclient or ldapsearch.
-  ```
-  Go to: Group Policy Management  
-  	Group Policy Objects > Deny LDAP Access > Edit 
-  		Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > User Rights Assignment
-  			Deny Access to this computer from the network > Add User or Group > LDAP_Deny_Group
-  ```
-  3. As the final step we link the GPO to the Domain Controllers ( The script already creates the Group and the GPO but manual step is necessary)
-  ```
-  Go to : Group Policy Management
-  	Domain Controllers > Right click > Link an existing GPO > Deny LDAP Access > OK
-  ```    
-[DC.webm](https://github.com/user-attachments/assets/3a71db16-ee3c-4f5e-907c-5b2fbb517e85)
-
-### CLIENT 2
-1. Access \\\\Client1\Share and copy [images.zip](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/images.zip) & [c2_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/c2_script.ps1), after that we run c2_script.ps1.
-   ```powershell
-   powershell -ep bypass
-   .\c2_script.ps1
-   ```
-[CLIENT2.webm](https://github.com/user-attachments/assets/39afdffa-71ce-488a-a22b-bf809d1fbf73)
-
-### CLIENT1
-1. Finally, run [c1_script.ps1](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/c1_script.ps1), this will add user Adrian to Local RDP Group, enable RDP, and enable Administrator's account.
-   ```powershell
-   powershell -ep bypass
-   .\c2_script.ps1
-   ```
-2. To assign user adrian SeImpersonatePrivilege
-  ```
-  Go to:
-  "Windows Administrative Tools" > "Local Security Poliy" > "Local Policies" "USer Rights Assignment" > "Impersonate client after authentication" > add > Adrian
-  ```
-3. Log-in as Administrator and run the following command to create an exploitation path.
-```
-runas.exe /u:Nicol /p:Ready4@ll! cmd.exe
-```
-[CLIENT1.webm](https://github.com/user-attachments/assets/92b2a1a1-659f-4849-a4b9-5a9706e76378)
 
 ## Attack Flow
-[READ FULL WRITE-UP HERE](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/Lab-Walktrough.pdf)
+[READ FULL WRITE-UP HERE](/Writeup/Lab-Walktrough.pdf)
 
 - Step 1: Initial Access
   Weak domain creds used to RDP to Client1
@@ -169,7 +80,7 @@ runas.exe /u:Nicol /p:Ready4@ll! cmd.exe
 
 
 ## Mitre ATT&CK Coverage
-- Use [ATTACK-navigator](https://github.com/reatva/Vulnerable-Active-Directory-Lab/blob/main/ATTACK-navigator-v4.5.json) file and uploaded it [HERE](https://mitre-attack.github.io/attack-navigator/) to see full attack matrix.
+- Use [ATTACK-navigator](/Documentation/ATTACK-navigator-v4.5.json) file and uploaded it [HERE](https://mitre-attack.github.io/attack-navigator/) to see full attack matrix.
 
 | Tactic               | Technique                                      | ID        | NOTES                                         |
 | -------------------- | ---------------------------------------------- | --------- | ----------------------------------------------------- |
@@ -185,10 +96,10 @@ runas.exe /u:Nicol /p:Ready4@ll! cmd.exe
 | Credential Access    | OS Credential Dumping: NTDS                    | T1003.003 | DCSync                                                |
 | Persistence          | Golden Ticket                                  | T1550.003 | Forge Golden Ticket                                   |
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
 
-
+## Disclaimer
+> [!NOTE] 
+> This lab is for educational and ethical purposes only. Never use these techniques on systems you do not own or have explicit permission to test.
 
 
 
