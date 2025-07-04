@@ -1,6 +1,6 @@
 # DCSync Attack in Active Directory
 
-## 🔍 Technique Overview
+## Technique Overview
 
 DCSync allows an attacker to simulate the behavior of a Domain Controller and request account credential material (NTDS hashes) from a real DC over LDAP. This doesn’t require code execution on the DC itself but **does** require high‑privilege rights.
 
@@ -9,7 +9,7 @@ DCSync allows an attacker to simulate the behavior of a Domain Controller and re
 
 ---
 
-## 🏗️ Lab Misconfiguration
+## Lab Misconfiguration
 
 The  user 'emmet' was granted the following rights via ACL on the Domain:
 
@@ -20,7 +20,7 @@ The  user 'emmet' was granted the following rights via ACL on the Domain:
 
 ---
 
-## 🚨 Exploitation Steps
+## Exploitation Steps
 
 1. **Run Impacket secretsdump.py**  
    On your attacker box, execute: 
@@ -29,7 +29,7 @@ The  user 'emmet' was granted the following rights via ACL on the Domain:
   ```
 Extracted hashes will appear in your console.
 
-🎯 Impact
+## Impact
 Full NTDS.dit credentials for every domain account, including highly privileged ones.
 
 Enables offline cracking, lateral movement, and Golden Ticket creation.
