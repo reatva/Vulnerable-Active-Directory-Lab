@@ -1,6 +1,6 @@
 # AS‑REP Roasting in Active Directory
 
-## 🔍 Technique Overview
+## Technique Overview
 
 AS‑REP Roasting is a credential‑access technique where an attacker requests an AS‑REP (Authentication Service Response) for accounts that do **not** require Kerberos pre‑authentication, then cracks the encrypted portion offline to recover cleartext passwords.
 
@@ -9,7 +9,7 @@ AS‑REP Roasting is a credential‑access technique where an attacker requests 
 
 ---
 
-## 🏗️ Lab Misconfiguration
+## Lab Misconfiguration
 
 The user **Lucy** was configured with:
 
@@ -21,7 +21,7 @@ The user **Lucy** was configured with:
 
 ---
 
-## 🚨 Exploitation Steps
+## Exploitation Steps
 
 1. **Enumerate AS‑REP‑Roastable Users**  
   ```bash
