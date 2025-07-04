@@ -44,7 +44,10 @@ A professionally structured Active Directory (AD) lab environment designed for h
 
 - Step 1: Initial Access
   Weak domain creds used to RDP to Client1
-
+  ```
+    username: adrian
+    password: Not4@ver3ge!
+  ```
 
 - Step 2: Privilege Escalation
   Potato exploit (SeImpersonatePrivilege) used to get SYSTEM shell
